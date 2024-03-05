@@ -1,7 +1,22 @@
 #include <windows.h>
 
+bool gameRunning = true;
+
 LRESULT CALLBACK window_callback(HWND handleWindow, UINT systemMessage, WPARAM messageInfo, LPARAM additionalInfo) {
-	return DefWindowProc(handleWindow, systemMessage, messageInfo, additionalInfo);
+	LRESULT result = 0;
+
+	switch (systemMessage) {
+		case WM_CLOSE:
+		case WM_DESTROY: {
+			gameRunning = false;
+		} break;
+
+		default: {
+			result = DefWindowProc(handleWindow, systemMessage, messageInfo, additionalInfo);
+		}
+	}
+
+	return result;
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nShowCmd) {
@@ -15,7 +30,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 	RegisterClass(&window_class);
 
 	// Create Window
-	CreateWindow(
+	HWND window = CreateWindow(
 		window_class.lpszClassName, 
 		"Table Tennis", 
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE, 
@@ -28,4 +43,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 		hInstance, 
 		0
 	);
+
+	while (gameRunning) {
+		// Input
+		MSG message;
+
+		while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&message);
+			DispatchMessage(&message);
+		}
+
+		// Simulate
+
+		// Render
+	}
 }
